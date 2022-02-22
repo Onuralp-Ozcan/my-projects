@@ -1,0 +1,57 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This CloudFormation Template was written for \nrunning Kittens Carousel Static Website on EC2. \nKittens Carousel Static Website will be \ndeployed on Amazon Linux 2 \n(ami-0a8b4cd432b1c3063) EC2 Instance with \ncustom security group which allows http \nconnections on port 80 and ssh port 22 from \nanywhere. Kittens Carousel Static Website \nis downloaded from my Public Github repository,\nthen deployed on Apache Web Server.\n",
+  "Resources": {
+    "WebServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable HTTP for Apache Web Server and SSH for secure connection.",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 80,
+            "ToPort": 80,
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "WebServerHost": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0a8b4cd432b1c3063",
+        "InstanceType": "t2.micro",
+        "KeyName": "firstkey",
+        "SecurityGroupIds": [
+          "WebServerSecurityGroup"
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Web Server of ${AWS::StackName} Stack"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#! /bin/bash\nyum update -y\nyum install httpd -y\nFOLDER=\"https://raw.githubusercontent.com/Onuralp-Ozcan/my-projects/main/aws/projects/Project-101-kittens-carousel-static-website-ec2/static-web\"\ncd /var/www/html\nwget $FOLDER/index.html\nwget $FOLDER/cat0.jpg\nwget $FOLDER/cat1.jpg\nwget $FOLDER/cat2.jpg\nwget $FOLDER/cat3.png\nsystemctl start httpd\nsystemctl enable httpd\n"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "WebsiteURL": {
+      "Value": [
+        "http://${PublicAddress}",
+        {
+          "PublicAddress": "WebServerHost.PublicDnsName"
+        }
+      ],
+      "Description": "Kittens Carousel Application URL"
+    }
+  }
+}
