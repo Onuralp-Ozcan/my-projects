@@ -1,0 +1,11 @@
+#!/bin/bash
+sudo yum update -y
+sudo amazon-linux-extras install -y
+pip3 install asgiref 
+pip3 install autopep8 
+pip3 install boto3 
+pip3 install botocore
+sudo yum install Django -y
+pip3 install django-crispy-forms
+pip3 install django-storages
+sudo yum install django-crispy-forms
